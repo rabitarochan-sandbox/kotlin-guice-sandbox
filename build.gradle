@@ -1,0 +1,80 @@
+buildscript {
+    ext.kotassert_version = "0.1.0"
+    ext.kotlin_version = "1.0.4"
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+
+// project settings
+
+apply plugin: "kotlin"
+apply plugin: "jacoco"
+apply plugin: "maven"
+apply plugin: "signing"
+
+group = "com.github.rabitarochan"
+version = kotassert_version
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+tasks.withType(SourceTask).findAll { it.hasProperty("options") } *.options*.encoding = "UTF-8"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // kotlin
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+    //guice
+    compile "com.google.inject:guice:4.1.0"
+
+    // test
+    testCompile "com.github.rabitarochan:kotassert:0.1.0"
+}
+
+test {
+    testLogging {
+        events "PASSED", "FAILED", "SKIPPED"
+        testLogging.showStandardStreams = true
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.enabled true
+    }
+}
+
+task javadocJar(type: Jar) {
+    classifier = "javadoc"
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = "sources"
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+
+// wrapper
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "3.1"
+}
